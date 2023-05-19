@@ -1,0 +1,186 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "messageEnvelope",
+    "required": [
+        "operationId",
+        "data"
+    ],
+    "properties": {
+        "operationId": {
+            "title": "The operationId Schema",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "f725da7e-af18-4bf2-85f9-610504cc3d40"
+            ]
+        },
+        "data": {
+            "title": "The data Schema",
+            "type": "object",
+            "default": {},
+            "required": [
+                "timestamp",
+                "id",
+                "product",
+                "port",
+                "demandDates"
+            ],
+            "properties": {
+                "timestamp": {
+                    "title": "The timestamp Schema",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                        "2022-07-29T00:00:00.000Z"
+                    ]
+                },
+                "id": {
+                    "title": "The id Schema",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                        "f725da7e-af18-4bf2-85f9-610504cc3d40"
+                    ]
+                },
+                "product": {
+                    "title": "The product Schema",
+                    "type": "object",
+                    "default": {},
+                    "required": [
+                        "name",
+                        "quantity"
+                    ],
+                    "properties": {
+                        "name": {
+                            "title": "The name Schema",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "minerals"
+                            ]
+                        },
+                        "quantity": {
+                            "title": "The quantity Schema",
+                            "type": "integer",
+                            "default": 0,
+                            "examples": [
+                                2
+                            ]
+                        }
+                    },
+                    "examples": [
+                        {
+                            "name": "minerals",
+                            "quantity": 2
+                        }
+                    ]
+                },
+                "port": {
+                    "title": "The port Schema",
+                    "type": "object",
+                    "default": {},
+                    "required": [
+                        "source",
+                        "destination"
+                    ],
+                    "properties": {
+                        "source": {
+                            "title": "The source Schema",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "Boston"
+                            ]
+                        },
+                        "destination": {
+                            "title": "The destination Schema",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "Charlotte"
+                            ]
+                        }
+                    },
+                    "examples": [
+                        {
+                            "source": "Boston",
+                            "destination": "Charlotte"
+                        }
+                    ]
+                },
+                "demandDates": {
+                    "title": "The demandDates Schema",
+                    "type": "object",
+                    "default": {},
+                    "required": [
+                        "start",
+                        "end"
+                    ],
+                    "properties": {
+                        "start": {
+                            "title": "The start Schema",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "2022-07-28T00:00:00.000Z"
+                            ]
+                        },
+                        "end": {
+                            "title": "The end Schema",
+                            "type": "string",
+                            "default": "",
+                            "examples": [
+                                "2022-07-29T00:00:00.000Z"
+                            ]
+                        }
+                    },
+                    "examples": [
+                        {
+                            "start": "2022-07-28T00:00:00.000Z",
+                            "end": "2022-07-29T00:00:00.000Z"
+                        }
+                    ]
+                }
+            },
+            "examples": [
+                {
+                    "timestamp": "2022-07-29T00:00:00.000Z",
+                    "id": "56bb0b4c-5c8c-4361-9771-25f997cf651b",
+                    "product": {
+                        "name": "minerals",
+                        "quantity": 2
+                    },
+                    "port": {
+                        "source": "Boston",
+                        "destination": "Charlotte"
+                    },
+                    "demandDates": {
+                        "start": "2022-07-28T00:00:00.000Z",
+                        "end": "2022-07-29T00:00:00.000Z"
+                    }
+                }
+            ]
+        }
+    },
+    "examples": [
+        {
+            "operationId": "f725da7e-af18-4bf2-85f9-610504cc3d40",
+            "data": {
+                "timestamp": "2022-07-29T00:00:00.000Z",
+                "id": "f725da7e-af18-4bf2-85f9-610504cc3d40",
+                "product": {
+                    "name": "minerals",
+                    "quantity": 2
+                },
+                "port": {
+                    "source": "Boston",
+                    "destination": "Charlotte"
+                },
+                "demandDates": {
+                    "start": "2022-07-28T00:00:00.000Z",
+                    "end": "2022-07-29T00:00:00.000Z"
+                }
+            }
+        }
+    ]
+}

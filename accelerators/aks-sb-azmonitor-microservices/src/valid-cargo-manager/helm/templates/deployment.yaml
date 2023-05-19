@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aks-sb-azmonitor-microservices.fullname" . }}
+  labels:
+    {{- include "aks-sb-azmonitor-microservices.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aks-sb-azmonitor-microservices.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "aks-sb-azmonitor-microservices.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: default
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ServiceBus__Topic
+              value: "validated-cargo"
+            - name: ServiceBus__Subscription
+              value: "valid-cargo"
+            - name: ServiceBus__Queue
+              value: "operation-state"
+            - name: ServiceBus__PrefetchCount
+              value: "100"
+            - name: ServiceBus__MaxConcurrentCalls
+              value: "10"
+            - name: CosmosDB__Database
+              value: "cargo"
+            - name: CosmosDB__Container
+              value: "valid-cargo"
+            - name: Logging__LogLevel__Default
+              value: "Information"
+            - name: Logging__LogLevel__Microsoft
+              value: "Warning"
+            - name: Logging__LogLevel__Microsoft.Hosting.Lifetime
+              value: "Information"
+            - name: HealthCheck__TcpServer__Port
+              value: "3030"
+            - name: HealthCheck__CosmosDB__MaxDurationMS
+              value: "1000"
+            - name: HealthCheck__ServiceBus__MaxDurationMS
+              value: "1000"
+            - name: ApplicationInsights__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: valid-cargo-manager-secrets
+                  key: AppInsightsConnectionString
+            - name: ServiceBus__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: valid-cargo-manager-secrets
+                  key: ServiceBusConnectionString
+            - name: CosmosDB__EndpointUri
+              valueFrom:
+                secretKeyRef:
+                  name: valid-cargo-manager-secrets
+                  key: CosmosDBEndpoint
+            - name: CosmosDB__PrimaryKey
+              valueFrom:
+                secretKeyRef:
+                  name: valid-cargo-manager-secrets
+                  key: CosmosDBKey
+          ports:
+            - name: http
+              containerPort: 3030
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 3030
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ include "aks-sb-azmonitor-microservices.fullname" . }}

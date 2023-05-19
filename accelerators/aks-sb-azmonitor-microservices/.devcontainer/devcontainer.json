@@ -1,0 +1,46 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/ubuntu
+{
+	"name": "aks-sb-azmonitor-microservices",
+	"build": {
+		"dockerfile": "Dockerfile",
+		// Update 'VARIANT' to pick an Ubuntu version: jammy / ubuntu-22.04, focal / ubuntu-20.04, bionic /ubuntu-18.04
+		// Use ubuntu-22.04 or ubuntu-18.04 on local arm64/Apple Silicon.
+		"args": {
+			"VARIANT": "ubuntu-22.04"
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"version": "1.3"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/stuartleeks/dev-container-features/azure-cli-persistence:0": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		"ghcr.io/devcontainers/features/docker-from-docker:1": {},
+		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+			"helm": "3.10.1"
+		}
+	},
+	"runArgs": [
+		// Attach dev container to host network so allow accessing services on the host
+		// when running via docker-compose
+		"--network", "host"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"timonwong.shellcheck",
+				"hashicorp.terraform",
+				"ms-azuretools.vscode-bicep",
+				"humao.rest-client"
+			]
+		}
+	}
+}

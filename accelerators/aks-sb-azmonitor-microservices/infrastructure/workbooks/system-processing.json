@@ -1,0 +1,492 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# System Processing Dashboard\n\nThis workbook shows data from system operation across services."
+      },
+      "name": "mainTitleText"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Microservices"
+            },
+            "name": "microservicesTitleText"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Statistics for endpoints requests\r\n\r\nThis chart displays different measures for time per requests. First measure is the mean per endpoint, second column goes for Median, columns 3, 4 ans 5 are for different percentiles ranges and finally last column displays the total amount of number requests per endpoint."
+            },
+            "name": "endpointsStatisticsText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| summarize Mean = avg(duration), (Median, p80, p95, p99) = percentiles(duration, 50, 80, 95, 99), Requests = count() by name\r\n| order by Requests desc",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Mean",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "orange"
+                    }
+                  },
+                  {
+                    "columnMatch": "Median",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "yellow"
+                    }
+                  },
+                  {
+                    "columnMatch": "p80",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "green"
+                    }
+                  },
+                  {
+                    "columnMatch": "p95",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  },
+                  {
+                    "columnMatch": "p99",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "purple"
+                    }
+                  },
+                  {
+                    "columnMatch": "Requests",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "pink"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "endpointsRequestsStatisticsQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Total request to endpoints\r\n\r\nThis chart extracts the last column from previous chart in order to gain more focus on this metric."
+            },
+            "name": "endpointsRequestsText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let dataset=requests\r\n| where client_Type != \"Browser\";\r\n\r\ndataset\r\n| summarize\r\n    Count=sum(itemCount),\r\n    Average=sum(itemCount * duration) / sum(itemCount)   \r\n| project operation_Name=\"Overall\", Count,Average\r\n| union(dataset\r\n    | summarize\r\n        Count=sum(itemCount),\r\n        Average=sum(itemCount * duration) / sum(itemCount) \r\n        by operation_Name\r\n    | sort by Count desc, Average desc\r\n    )",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Average",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "turquoise"
+                    }
+                  },
+                  {
+                    "columnMatch": "Count",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "orange"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "endpointsRequestsQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Last 100 operations executed\r\n\r\nThis list shows the last 100 of operations executed and their asociated operation ID. You can use this value to request more information from the link after the list that will redirect you to a **Transaction Search** tool."
+            },
+            "name": "operationsText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| top 100 by timestamp\r\n| distinct name, operation_Id",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ]
+            },
+            "name": "lastOperationsQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "You can go and check the **Transaction Search** [here](https://portal.azure.com/#blade/AppInsightsExtension/BladeRedirect/BladeName/searchV1/ResourceId/%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2/BladeInputs/%7B%22tables%22%3A%5B%22availabilityResults%22%2C%22requests%22%2C%22exceptions%22%2C%22pageViews%22%2C%22traces%22%2C%22customEvents%22%2C%22dependencies%22%5D%7D). \r\n\r\nAnd using the list above of the last 100 operation IDs start looking for an specific operation."
+            },
+            "name": "transactionSearchBladeText"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Additional telemetry\r\n\r\nYou can find in these sections more information that you can use or add to this workbook.\r\n\r\n|Application map|Availability|Failures|Performance|\r\n|---------------|------------|--------|-----------|\r\n|[Link](https://portal.azure.com/#blade/AppInsightsExtension/BladeRedirect/BladeName/applicationMap/ResourceId/%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2/BladeInputs/%7B%22MainResourceId%22%3A%22%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2%22%2C%22TimeContext%22%3A%7B%22durationMs%22%3A3600000%2C%22createdTime%22%3A%222023-03-07T15%3A39%3A08.000Z%22%2C%22isInitialTime%22%3Afalse%2C%22grain%22%3A1%2C%22useDashboardTimeRange%22%3Afalse%7D%2C%22DataModel%22%3A%7B%22exclude4xxError%22%3Atrue%2C%22timeContext%22%3A%7B%22durationMs%22%3A3600000%2C%22createdTime%22%3A%222023-03-07T15%3A39%3A08.000Z%22%2C%22isInitialTime%22%3Afalse%2C%22grain%22%3A1%2C%22useDashboardTimeRange%22%3Afalse%7D%2C%22layoutOption%22%3A%22Organic%22%2C%22nodeContentFilter%22%3A%22%22%7D%7D)|[Link](https://portal.azure.com/#blade/AppInsightsExtension/BladeRedirect/BladeName/availability/ResourceId/%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2/BladeInputs/%7B%22filters%22%3A%5B%5D%2C%22timeContext%22%3A%7B%22durationMs%22%3A86400000%2C%22createdTime%22%3A%222023-03-07T12%3A54%3A05.627Z%22%2C%22endTime%22%3A%222023-03-07T15%3A39%3A00.000Z%22%2C%22isInitialTime%22%3Afalse%2C%22grain%22%3A1%2C%22useDashboardTimeRange%22%3Afalse%7D%2C%22experience%22%3A5%2C%22roleSelectors%22%3A%5B%5D%7D)|[Link](https://portal.azure.com/#blade/AppInsightsExtension/BladeRedirect/BladeName/failures/ResourceId/%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2/BladeInputs/%7B%22filters%22%3A%5B%5D%2C%22timeContext%22%3A%7B%22durationMs%22%3A86400000%2C%22createdTime%22%3A%222023-03-07T12%3A54%3A05.627Z%22%2C%22endTime%22%3A%222023-03-07T12%3A58%3A00.000Z%22%2C%22isInitialTime%22%3Afalse%2C%22grain%22%3A1%2C%22useDashboardTimeRange%22%3Afalse%7D%2C%22selectedOperation%22%3Anull%2C%22experience%22%3A4%2C%22roleSelectors%22%3A%5B%5D%2C%22clientTypeMode%22%3A%22Server%22%7D)|[Link](https://portal.azure.com/#blade/AppInsightsExtension/BladeRedirect/BladeName/performance/ResourceId/%2Fsubscriptions%2F30a83aff-7a8b-4ca3-aa48-ab93268b5a8b%2FresourceGroups%2Frg-dev-tf-amines4%2Fproviders%2FMicrosoft.Insights%2Fcomponents%2Fdev-appi-accl-glc-eastus2/BladeInputs/%7B%22filters%22%3A%5B%5D%2C%22timeContext%22%3A%7B%22durationMs%22%3A86400000%2C%22createdTime%22%3A%222023-03-07T12%3A54%3A05.627Z%22%2C%22endTime%22%3A%222023-03-07T15%3A41%3A00.000Z%22%2C%22isInitialTime%22%3Afalse%2C%22grain%22%3A1%2C%22useDashboardTimeRange%22%3Afalse%7D%2C%22selectedOperation%22%3Anull%2C%22experience%22%3A1%2C%22roleSelectors%22%3A%5B%5D%2C%22clientTypeMode%22%3A%22Server%22%7D)|"
+            },
+            "name": "aditionalTelemetryText"
+          }
+        ]
+      },
+      "name": "microservicesTelemetryGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Microservices operations telemetry\r\n\r\nSelect from the following parameters the options to display desired results:\r\nFirst parameter is for a time range and second one is for the service you want to monitor."
+            },
+            "name": "operationsTitleText"
+          },
+          {
+            "type": 9,
+            "content": {
+              "version": "KqlParameterItem/1.0",
+              "parameters": [
+                {
+                  "id": "8f9405b8-1cc0-419f-a465-f35464bb15c0",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "param_time_range",
+                  "label": "Time Range",
+                  "type": 4,
+                  "description": "Select the time range for queries",
+                  "isRequired": true,
+                  "typeSettings": {
+                    "selectableValues": [
+                      {
+                        "durationMs": 900000
+                      },
+                      {
+                        "durationMs": 1800000
+                      },
+                      {
+                        "durationMs": 3600000
+                      },
+                      {
+                        "durationMs": 14400000
+                      },
+                      {
+                        "durationMs": 43200000
+                      },
+                      {
+                        "durationMs": 86400000
+                      },
+                      {
+                        "durationMs": 172800000
+                      },
+                      {
+                        "durationMs": 259200000
+                      },
+                      {
+                        "durationMs": 604800000
+                      },
+                      {
+                        "durationMs": 1209600000
+                      },
+                      {
+                        "durationMs": 2419200000
+                      },
+                      {
+                        "durationMs": 2592000000
+                      }
+                    ],
+                    "allowCustom": true
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "value": {
+                    "durationMs": 1800000
+                  }
+                },
+                {
+                  "id": "5da2ece4-7e2b-4356-a8ce-795bf3e58bd2",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "paramCloudRoleName",
+                  "label": "Cloud Role",
+                  "type": 2,
+                  "query": "dependencies\r\n| distinct cloud_RoleName\r\n| order by cloud_RoleName asc",
+                  "crossComponentResources": [
+                    "${app_insights_id}"
+                  ],
+                  "typeSettings": {
+                    "additionalResourceOptions": []
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 0,
+                  "resourceType": "microsoft.insights/components"
+                },
+                {
+                  "id": "0093df18-0e13-4eac-b50e-1afbc78a7b9c",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "appinsights",
+                  "type": 5,
+                  "description": "Used as a single place to set the app insights resource to query",
+                  "isHiddenWhenLocked": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[\"/subscriptions/30a83aff-7a8b-4ca3-aa48-ab93268b5a8b/resourceGroups/rg-dev-tf-amines4/providers/Microsoft.Insights/components/dev-appi-accl-glc-eastus2\"]",
+                  "value": "${app_insights_id}"
+                }
+              ],
+              "style": "pills",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "operationsParameters"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### End to end processing time\r\n\r\nThis chart displays the end to end processing time. This is measured in seconds and to be displayed requires the selection of parameters time range and cloud role."
+            },
+            "name": "endToEndProcessingText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let put_name = strcat(\"PUT /cargo/{cargoId\", \"}\"); // TODO - determine how to escape curly braces!\r\nlet cargo_processing_api = requests\r\n| where cloud_RoleName == \"cargo-processing-api\" and (name == \"POST /cargo/\" or name == put_name) and timestamp {param_time_range}\r\n| project-rename ingest_timestamp = timestamp\r\n| project ingest_timestamp, operation_Id\r\n;\r\nlet operation_api_succeeded = requests\r\n| where cloud_RoleName  == \"operations-api\" and name == \"ServiceBus.process\" and customDimensions[\"operation-state\"]  == \"Succeeded\"\r\n| extend operation_api_completed = timestamp + (duration*1ms)\r\n| project operation_Id, operation_api_completed\r\n;\r\ncargo_processing_api\r\n| join kind=inner operation_api_succeeded  on $left.operation_Id == $right.operation_Id\r\n| extend end_to_end_Duration_s = (operation_api_completed - ingest_timestamp) /1s\r\n| summarize avg(end_to_end_Duration_s), max(end_to_end_Duration_s) by bin(ingest_timestamp, {param_time_range:grain})\r\n| order by ingest_timestamp desc\r\n| project ingest_timestamp, avg_end_to_end_Duration_s, max_end_to_end_Duration_s\r\n| render timechart \r\n",
+              "size": 0,
+              "aggregation": 3,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "avg_end_to_end_Duration_s",
+                    "label": "Avg duration (s)",
+                    "color": "blue"
+                  },
+                  {
+                    "seriesName": "max_end_to_end_Duration_s",
+                    "label": "Max duration (s)",
+                    "color": "lightBlue"
+                  }
+                ]
+              }
+            },
+            "name": "endToEndProcessingQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Request count\r\n\r\nThis chart displays the count of ingest of requests. It required the selection of parameters time range and cloud role."
+            },
+            "name": "requestsCountText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let put_name = strcat(\"PUT /cargo/{cargoId\", \"}\"); // TODO - determine how to escape curly braces!\r\nrequests\r\n| where cloud_RoleName == \"cargo-processing-api\" and (name == \"POST /cargo/\" or name == put_name) and timestamp {param_time_range}\r\n| summarize request_count=count() by bin(timestamp, {param_time_range:grain})\r\n| project timestamp, request_count\r\n| render timechart \r\n",
+              "size": 1,
+              "showAnalytics": true,
+              "color": "gray",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ]
+            },
+            "name": "requestsCountQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Services processing time \r\n\r\nThis chart displays the processing time in the services. This is measured in seconds and to be displayed requires the selection of parameters time range and cloud role."
+            },
+            "name": "servicesProcessingTimeText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let put_name = strcat(\"PUT /cargo/{cargoId\", \"}\"); // TODO - determine how to escape curly braces!\r\nlet cargo_processing_api = requests\n    | where cloud_RoleName == \"cargo-processing-api\" and (name == \"POST /cargo/\" or name == put_name) and timestamp {param_time_range}\n    | project-rename durationMs=duration\n    | extend duration=durationMs * 1ms\n    | project timestamp, cloud_RoleName, cloud_RoleInstance, duration, operation_Id\n;\nlet cargo_processing_validator = requests\n    | where cloud_RoleName == \"cargo-processing-validator\" and (name == \"ServiceBus.ProcessMessage\" or name == \"ServiceBusQueue.ProcessMessage\")\n    | project-rename durationMs=duration\n    | extend duration=durationMs * 1ms\n    | project timestamp, cloud_RoleName, cloud_RoleInstance, duration, operation_Id\n;\nlet valid_cargo_manager = requests\n    | where cloud_RoleName == \"valid-cargo-manager\" and name == \"ServiceBusTopic.ProcessMessage\"\n    | project-rename durationMs=duration\n    | extend duration=durationMs * 1ms\n    | project timestamp, cloud_RoleName, cloud_RoleInstance, name, duration, operation_Id\n;\nlet invalid_cargo_manager = requests\n    | where cloud_RoleName == \"invalid-cargo-manager\" and name == \"ServiceBusTopic.ProcessMessage\"\n    | project-rename durationMs=duration\n    | extend duration=durationMs * 1ms\n    | project timestamp, cloud_RoleName, cloud_RoleInstance, name, duration, operation_Id\n;\ncargo_processing_api\n| join kind=leftouter cargo_processing_validator on $left.operation_Id == $right.operation_Id\n| join kind=leftouter valid_cargo_manager on $left.operation_Id == $right.operation_Id\n| join kind=leftouter invalid_cargo_manager on $left.operation_Id == $right.operation_Id\n| project-rename\n    cpa_timestamp=timestamp, cpa_duration=duration, \n    cpv_timestamp=timestamp1, cpv_duration=duration1,\n    vcm_timestamp=timestamp2, vcm_duration=duration2,\n    icm_timestamp=timestamp3, icm_duration=duration3\n| extend\n    time_to_cpv=cpv_timestamp - cpa_timestamp,\n    time_to_vcm=vcm_timestamp - cpv_timestamp,\n    time_to_icm=icm_timestamp - cpv_timestamp\n| extend\n    in_cpa_s = cpa_duration / 1s,\n    in_cpv_s = cpv_duration / 1s,\n    in_vcm_s = vcm_duration / 1s,\n    in_icm_s = icm_duration / 1s\n| summarize \n    avg(in_cpa_s),\n    avg(in_cpv_s),\n    avg(in_vcm_s),\n    avg(in_icm_s)\n    by bin (cpa_timestamp, {param_time_range:grain})\n| order by cpa_timestamp desc\n| render areachart with(kind=stacked)\n",
+              "size": 0,
+              "aggregation": 3,
+              "showAnalytics": true,
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "chartSettings": {
+                "xAxis": "cpa_timestamp",
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "avg_to_cpv_s",
+                    "label": "Average time to cargo-processing_validator",
+                    "color": "redBright"
+                  },
+                  {
+                    "seriesName": "avg_to_vcm_s",
+                    "color": "green"
+                  },
+                  {
+                    "seriesName": "avg_to_icm_s",
+                    "color": "lightBlue"
+                  },
+                  {
+                    "seriesName": "avg_in_cpa_s",
+                    "color": "yellow"
+                  },
+                  {
+                    "seriesName": "avg_in_cpv_s",
+                    "color": "red"
+                  },
+                  {
+                    "seriesName": "avg_in_vcm_s",
+                    "color": "greenDark"
+                  },
+                  {
+                    "seriesName": "avg_in_icm_s",
+                    "color": "blue"
+                  }
+                ]
+              }
+            },
+            "name": "servicesProcessingTimeQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Service dependency\r\n\r\nThis chart displays the service dependency duration. This is measured in seconds and to be displayed requires the selection of parameters time range and cloud role."
+            },
+            "name": "serviceDependencyText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let replace_guid = '[({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?';\r\ndependencies\r\n| where cloud_RoleName == \"{paramCloudRoleName}\" and timestamp {param_time_range}\r\n| extend name_pattern = replace_regex(name, replace_guid, \"<guid>\")\r\n| extend duration_s = duration /1000\r\n| summarize avg(duration_s) by name_pattern, bin(timestamp, {param_time_range:grain})\r\n| project-reorder timestamp, avg_duration_s , name_pattern\r\n| render areachart with(kind=stacked)",
+              "size": 0,
+              "aggregation": 3,
+              "showAnalytics": true,
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ]
+            },
+            "name": "serviceDependencyQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Breakdown by destination port\r\n\r\nThis chart displays the end to end processing time by destination port. This is measured in seconds and to be displayed requires the selection of parameters time range and cloud role."
+            },
+            "name": "destinationPortBreakdownText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "let put_name = strcat(\"PUT /cargo/{cargoId\", \"}\"); // TODO - determine how to escape curly braces!\r\nlet portMap = requests\r\n| where cloud_RoleName == \"cargo-processing-validator\"\r\n| extend destinationPort = customDimensions[\"cargo-destination\"]\r\n| project operation_Id, destinationPort;\r\nlet cargo_processing_api = requests\r\n| where cloud_RoleName == \"cargo-processing-api\" and (name == \"POST /cargo/\" or name == put_name) and timestamp {param_time_range}\r\n| project-rename ingest_timestamp = timestamp\r\n| project ingest_timestamp, operation_Id\r\n;\r\nlet operation_api_succeeded = requests\r\n| where cloud_RoleName  == \"operations-api\" and name == \"ServiceBus.process\" and customDimensions[\"operation-state\"]  == \"Succeeded\"\r\n| extend operation_api_completed = timestamp + (duration*1ms)\r\n| project operation_Id, operation_api_completed\r\n;\r\ncargo_processing_api\r\n| join kind=inner operation_api_succeeded  on $left.operation_Id == $right.operation_Id\r\n| join kind=leftouter portMap on $left.operation_Id == $right.operation_Id\r\n| extend end_to_end_Duration_s = (operation_api_completed - ingest_timestamp) /1s\r\n| extend destinationPort=iif(destinationPort ==\"\", \"<unknown>\", destinationPort)\r\n| summarize avg(end_to_end_Duration_s) by destinationPort, bin(ingest_timestamp, {param_time_range:grain})\r\n| project ingest_timestamp, avg_end_to_end_Duration_s, destinationPort\r\n| render timechart ",
+              "size": 0,
+              "aggregation": 3,
+              "showAnalytics": true,
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ]
+            },
+            "name": "destinationPortBreakdownQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Pod Restarts\r\n\r\nThis chart shows the number of times each service pod has restarted."
+            },
+            "name": "podRestartText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "KubePodInventory\r\n| where ServiceName == \"{paramCloudRoleName}\"\r\n| summarize numRestarts = sum(PodRestartCount) by ServiceName, bin(TimeGenerated, 1m)\r\n| render timechart",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            },
+            "name": "podRestartQuery"
+          }
+        ]
+      },
+      "name": "operationsTelemetryGroup"
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

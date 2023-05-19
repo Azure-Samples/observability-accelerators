@@ -1,0 +1,477 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# Infrastructure Dashboard\nThis workbook has been created to provide a consolidated view of the system infrastructure"
+      },
+      "name": "mainTitleText"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Service Bus Telemetry\r\n\r\nThis section displays telemetry obtained from Service Bus operations."
+            },
+            "name": "serviceBusTitleText"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Service Bus completed operations\r\nThese tiles display the following:\r\n* The fastest time an operation takes to be completed.\r\n* The average time all operations take to be completed.\r\n* The slowest time an operation takes to be completed.\r\n\r\nAll data is being displayed in milliseconds."
+            },
+            "name": "serviceBusDescriptionText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "dependencies\r\n| where name == \"ServiceBus.complete\"\r\n| summarize Result = avg(duration), Name = \"Average\"\r\n| union (dependencies\r\n| where name == \"ServiceBus.complete\"\r\n| top 1 by duration asc \r\n| summarize count() by Result = duration, Name = \"Fastest\")\r\n| union ( dependencies\r\n| where name == \"ServiceBus.complete\"\r\n| top 1 by duration desc \r\n| summarize count() by Result = duration, Name = \"Slowest\")",
+              "size": 0,
+              "showAnalytics": true,
+              "title": "Statistics of service bus completed operations (ms)",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "Name",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "Result",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "style": "decimal",
+                      "maximumFractionDigits": 2,
+                      "maximumSignificantDigits": 3
+                    }
+                  }
+                },
+                "showBorder": false,
+                "sortOrderField": 1
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "id",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "duration",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                },
+                "nodeIdField": "duration",
+                "sourceIdField": "timestamp",
+                "targetIdField": "name",
+                "graphOrientation": 3,
+                "showOrientationToggles": false,
+                "nodeSize": null,
+                "staticNodeSize": 100,
+                "colorSettings": null,
+                "hivesMargin": 5
+              }
+            },
+            "customWidth": "50",
+            "name": "serviceBusCompletedTimesQuery",
+            "styleSettings": {
+              "showBorder": true
+            }
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Count of Messages\r\n\r\nThis chart displays:\r\n* The count of active messages in a Queue/Topic\r\n* The count of delivered messages in a Queue/Topic\r\n* The count of dead-lettered messages in a Queue/Topic"
+            },
+            "name": "serviceBusMessageCountText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook0f9894a2-554d-406d-b03e-c87fe7b37293",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "resourceType": "microsoft.servicebus/namespaces",
+              "metricScope": 0,
+              "resourceIds": [
+                "${servicebus_namespace_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.servicebus/namespaces",
+                  "metric": "microsoft.servicebus/namespaces--ActiveMessages",
+                  "aggregation": 4,
+                  "splitBy": null
+                },
+                {
+                  "namespace": "microsoft.servicebus/namespaces",
+                  "metric": "microsoft.servicebus/namespaces--Messages",
+                  "aggregation": 4
+                },
+                {
+                  "namespace": "microsoft.servicebus/namespaces",
+                  "metric": "microsoft.servicebus/namespaces--DeadletteredMessages",
+                  "aggregation": 4
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "serviceBusMessagingMetric"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Throttled Requests\r\n\r\nThis chart displays the number of throttled requests in Service Bus."
+            },
+            "name": "serviceBusThrottledText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbooke8c22d13-3c2a-4fc8-8722-0180737c45f4",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "blueDark",
+              "resourceType": "microsoft.servicebus/namespaces",
+              "metricScope": 0,
+              "resourceIds": [
+                "${servicebus_namespace_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.servicebus/namespaces",
+                  "metric": "microsoft.servicebus/namespaces--ThrottledRequests",
+                  "aggregation": 1,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "serviceBusThrottledMetric"
+          }
+        ]
+      },
+      "name": "serviceBusTelemetryGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Cosmos DB Telemetry\r\n\r\nThis section displays telemetry obtained from Cosmos DB operations."
+            },
+            "name": "cosmosDbTitleText"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Average time for reads from Cosmos DB\r\n\r\nThis chart displays the average time per read requests from Cosmos DB."
+            },
+            "name": "cosmosDbDescriptionText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "dependencies \r\n| where target == \"readDatabase.cargo\" \r\n| summarize Average = avg(duration) by bin(timestamp, 10m)\r\n| render timechart",
+              "size": 0,
+              "showAnalytics": true,
+              "aggregation": 3,
+              "color": "green",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "visualization": "areachart"
+            },
+            "name": "latencyOfReadsCosmosDbQuery"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Number of valid, invalid and operations saved.\r\n\r\nThis chart displays the total number of valid, invalid and operations writes into Cosmos DB."
+            },
+            "name": "cosmosDbOperationsText"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "dependencies\r\n| summarize dependencies = count() by name\r\n| where name == \"upsertItem.operations\" or name == \"upsertItem.invalid-cargo\" or name == \"upsertItem.valid-cargo\"",
+              "size": 0,
+              "showAnalytics": true,
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "crossComponentResources": [
+                "${app_insights_id}"
+              ],
+              "visualization": "piechart"
+            },
+            "name": "cosmosDbOperationsQuery"
+          }
+        ]
+      },
+      "name": "cosmosDbTelemetryGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Key Vault\r\n\r\n### Key Vault Saturation\r\n\r\nThis metric displays the percentage of saturation Key Vault is having at the moment."
+            },
+            "name": "keyVaultTitleText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook1dfaaa15-6964-4398-a9ab-4849c2e07653",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "turquoise",
+              "resourceType": "microsoft.keyvault/vaults",
+              "metricScope": 0,
+              "resourceIds": [
+                "${key_vault_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.keyvault/vaults",
+                  "metric": "microsoft.keyvault/vaults--SaturationShoebox",
+                  "aggregation": 4,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "keyVaultSaturationMetric"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Key Vault Latency\r\n\r\nThis metric displays the latency when executing an operation to KeyVault. The metric displays an average time and it is being estimated in milliseconds."
+            },
+            "name": "keyVaultLatencyText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook7000b67b-e89a-4481-99d3-779513f70214",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "turquoise",
+              "resourceType": "microsoft.keyvault/vaults",
+              "metricScope": 0,
+              "resourceIds": [
+                "${key_vault_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.keyvault/vaults",
+                  "metric": "microsoft.keyvault/vaults--ServiceApiLatency",
+                  "aggregation": 4,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "keyVaultLatencyMetric"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Key Vault Results (Count)\r\n\r\nThis metric displays the count of Key Vault API Results."
+            },
+            "name": "keyVaultResultsText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook93558986-b83b-4a80-8cbf-1d588fc01058",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "turquoise",
+              "resourceType": "microsoft.keyvault/vaults",
+              "metricScope": 0,
+              "resourceIds": [
+                "${key_vault_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.keyvault/vaults",
+                  "metric": "microsoft.keyvault/vaults--ServiceApiResult",
+                  "aggregation": 7,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "keyVaultResultsMetric"
+          }
+        ]
+      },
+      "name": "keyVaultTelemetryGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Kubernetes\r\n\r\n### CPU Percentage\r\n\r\nThis chart displays the max count of CPU percentage of the cluster."
+            },
+            "name": "aksTitleText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook171b383f-5043-41dd-9154-a1fa92367891",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "pink",
+              "resourceType": "microsoft.containerservice/managedclusters",
+              "metricScope": 0,
+              "resourceIds": [
+                "${aks_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.containerservice/managedclusters",
+                  "metric": "microsoft.containerservice/managedclusters-Nodes (PREVIEW)-node_cpu_usage_percentage",
+                  "aggregation": 3,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "aksCpuMetric"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Requests\r\n\r\nThis chart shows the average inflight requests to the cluster."
+            },
+            "name": "aksRequestsText"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbook2e1c3664-7b39-433d-81b2-863ab1b9b307",
+              "version": "MetricsItem/2.0",
+              "size": 0,
+              "showAnalytics": true,
+              "chartType": 3,
+              "color": "pink",
+              "resourceType": "microsoft.containerservice/managedclusters",
+              "metricScope": 0,
+              "resourceIds": [
+                "${aks_id}"
+              ],
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.containerservice/managedclusters",
+                  "metric": "microsoft.containerservice/managedclusters-API Server (PREVIEW)-apiserver_current_inflight_requests",
+                  "aggregation": 4,
+                  "splitBy": null
+                }
+              ],
+              "gridSettings": {
+                "rowLimit": 10000
+              }
+            },
+            "name": "aksRequestsMetric"
+          }
+        ]
+      },
+      "name": "aksTelemetryGroup"
+    }
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

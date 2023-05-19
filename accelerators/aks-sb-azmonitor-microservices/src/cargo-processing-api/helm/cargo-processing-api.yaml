@@ -1,0 +1,36 @@
+
+image:
+  pullPolicy: Always
+  tag: "latest"
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+
+# When running one of the deploy-*.sh scripts, an additional env.yaml
+# values file is created containing values specific to the deployed environment
+# with the following values:
+# image:
+#   repository: <acr-qualified image name>
+
+# keyVault:
+#   name: <keyvault name>
+#   tenantId: <tenant id>
+
+# aksKeyVaultSecretProviderIdentityId: <keyvault identity id>

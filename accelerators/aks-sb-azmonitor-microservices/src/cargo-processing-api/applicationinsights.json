@@ -1,0 +1,17 @@
+{
+  "role": {
+    "name": "cargo-processing-api"
+  },
+  "instrumentation": {
+    "logging": {
+      "level": "INFO"
+    }
+  },
+  "preview": {
+    "instrumentation": {
+      "springIntegration": {
+        "enabled": true
+      }
+    }
+  }
+}

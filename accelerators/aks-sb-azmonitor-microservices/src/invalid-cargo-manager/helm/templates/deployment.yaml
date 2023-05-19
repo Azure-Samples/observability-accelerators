@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aks-sb-azmonitor-microservices.fullname" . }}
+  labels:
+    {{- include "aks-sb-azmonitor-microservices.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aks-sb-azmonitor-microservices.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "aks-sb-azmonitor-microservices.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: default
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SERVICE_BUS_TOPIC_NAME
+              value: validated-cargo
+            - name: SERVICE_BUS_SUBSCRIPTION_NAME
+              value: invalid-cargo
+            - name: SERVICE_BUS_QUEUE_NAME
+              value: operation-state
+            - name: SERVICE_BUS_MAX_MESSAGE_COUNT
+              value: "1"
+            - name: SERVICE_BUS_MAX_WAIT_TIME
+              value: "5"
+            - name: COSMOS_DB_DATABASE_NAME
+              value: cargo
+            - name: COSMOS_DB_CONTAINER_NAME
+              value: invalid-cargo
+            - name: CLOUD_LOGGING_LEVEL
+              value: INFO
+            - name: CONSOLE_LOGGING_LEVEL
+              value: DEBUG
+            - name: HEALTH_CHECK_SERVICE_BUS_DEGRADED_THRESHOLD_SECONDS
+              value: "30"
+            - name: HEALTH_CHECK_SERVICE_BUS_UNHEALTHY_THRESHOLD_SECONDS
+              value: "60"
+            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: invalid-cargo-manager-secrets
+                  key: AppInsightsConnectionString
+            - name: SERVICE_BUS_CONNECTION_STR
+              valueFrom:
+                secretKeyRef:
+                  name: invalid-cargo-manager-secrets
+                  key: ServiceBusConnectionString
+            - name: COSMOS_DB_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: invalid-cargo-manager-secrets
+                  key: CosmosDBEndpoint
+            - name: COSMOS_DB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: invalid-cargo-manager-secrets
+                  key: CosmosDBKey
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ include "aks-sb-azmonitor-microservices.fullname" . }}

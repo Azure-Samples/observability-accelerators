@@ -1,0 +1,122 @@
+# This file shows how to make requests against the deployed API
+# The following lines load the IP address for the deployed services from a .env file
+# This file is created for you when you deploy the services
+@cargo_service=http://{{$dotenv SERVICE_IP}}
+@operations_service=http://{{$dotenv SERVICE_IP}}
+
+# Uncomment the following lines to use locally running services
+# @cargo_service=http://localhost:8080
+# @operations_service=http://localhost:8081
+
+
+#
+# issue a POST request to create a valid cargo request
+#
+# @name createRequest
+POST {{cargo_service}}/cargo/
+Content-Type: application/json
+operation-id: {{$guid}}
+
+{
+  "product": {
+    "name": "Toys",
+    "quantity": 100
+  },
+  "port": {
+    "source": "New York City",
+    "destination": "Tacoma"
+  },
+  "demandDates": {
+    "start": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 10 d}}Z",
+    "end": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 15 d}}Z"
+  }
+}
+
+###
+# issue a PUT request to update the previous cargo request
+#
+
+PUT {{cargo_service}}/cargo/{{createRequest.response.body.id}}
+Content-Type: application/json
+
+{
+    "product": {
+    "name": "Toys",
+    "quantity": 100
+  },
+  "port": {
+    "source": "New York City",
+    "destination": "Seattle"
+  },
+  "demandDates": {
+    "start": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 10 d}}Z",
+    "end": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 15 d}}Z"
+  }
+}
+
+
+###
+# issue a GET request to retrieve the status of the previous cargo request
+#
+GET {{operations_service}}/operations/{{createRequest.response.headers.operation-id}}
+
+###############################################################
+
+#
+# issue a POST request to create a valid cargo request (start date cannot be more than 60 days in the future)
+# 
+
+# @name createRequest_invalid
+POST {{cargo_service}}/cargo/
+Content-Type: application/json
+operation-id: {{$guid}}
+
+{
+  "product": {
+    "name": "Toys",
+    "quantity": 100
+  },
+  "port": {
+    "source": "New York City",
+    "destination": "Tacoma"
+  },
+  "demandDates": {
+    "start": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 70 d}}Z",
+    "end": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 75 d}}Z"
+  }
+}
+
+
+
+###
+# issue a GET request to retrieve the status of the previous cargo request
+#
+
+GET {{operations_service}}/operations/{{createRequest_invalid.response.headers.operation-id}}
+
+
+###############################################################
+# Test degraded behaviour:
+
+###
+# issue a POST request to create a cargo request with processing delays
+# (destination port slow-port)
+#
+POST {{cargo_service}}/cargo/
+Content-Type: application/json
+operation-id: {{$guid}}
+
+{
+  "product": {
+    "name": "Toys",
+    "quantity": 100
+  },
+  "port": {
+    "source": "New York City",
+    "destination": "slow-port"
+  },
+  "demandDates": {
+    "start": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 10 d}}Z",
+    "end": "{{$localDatetime "YYYY-MM-DDThh:mm:ss.ms" 15 d}}Z"
+  }
+}

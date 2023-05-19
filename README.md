@@ -1,57 +1,17 @@
-# Project Name
+# Observability Accelerators
 
-(short, 1-3 sentenced, description of the project)
+This repository contains multiple samples that are meant to accelerate development in the Observability and Monitoring space on Azure.
 
-## Features
+Each accelerator focuses on a different application architecture. They contain all source code and infrastructure as code necessary to deploy the application, as well as in-depth documentation that details important O&M concepts.
 
-This project framework provides the following features:
+Navigate to one of the accelerators in the list below. The README will include instructions on how to get started with that application.
 
-* Feature 1
-* Feature 2
-* ...
+## Accelerator Index
 
-## Getting Started
+| Accelerator                                                                                                  | Description                                                                                      |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| [Azure Monitor in a Distributed Application on AKS](./accelerators/aks-sb-azmonitor-microservices/README.md) | Containerized services deployed to AKS with HTTP and message-based interservice communications. |
 
-### Prerequisites
+## Trademarks
 
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow Microsoft’s Trademark & Brand Guidelines. Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party’s policies.

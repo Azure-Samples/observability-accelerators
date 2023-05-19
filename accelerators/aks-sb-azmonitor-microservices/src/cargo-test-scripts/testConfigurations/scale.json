@@ -1,0 +1,30 @@
+{
+    "tests": [
+        {
+            "name": "End to End Validation at scale",
+            "target": "cargo-processing-api",
+            "volume": 10000,
+            "validateResults": true,
+            "validationDelayInMilliseconds": 60000,
+            "maxRetries": 5,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 10,
+                "chaosSettings": [
+                    {
+                        "target": "operations-api",
+                        "type": "service-failure",
+                        "chanceToCauseChaos": 4,
+                        "isEnabled": false
+                    },
+                    {
+                        "target": "cargo-processing-api",
+                        "type": "duplicate",
+                        "chanceToCauseChaos": 4,
+                        "isEnabled": false
+                    }
+                ]
+            }
+        }
+    ]
+}
