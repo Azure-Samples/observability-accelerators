@@ -1,0 +1,24 @@
+{
+    "tests": [
+        {
+            "name": "CHAOS: Cargo Processing Validator Starting",
+            "target": "cargo-processing-api",
+            "volume": 1,
+            "validateResults": false,
+            "validationDelayInMilliseconds": 10000,
+            "delayBetweenCargoInMilliseconds": 1000,
+            "maxRetries": 5,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 0,
+                "chaosSettings": [
+                    {
+                        "target": "cargo-processing-api",
+                        "type": "operations-api-failure",
+                        "chanceToCauseChaos": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

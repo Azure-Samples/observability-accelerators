@@ -1,0 +1,7 @@
+plan.out
+terraform.tfvars
+azuredeploy.parameters.json
+.env
+
+output.json
+env.yaml

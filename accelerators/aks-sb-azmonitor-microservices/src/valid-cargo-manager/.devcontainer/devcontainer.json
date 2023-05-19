@@ -1,0 +1,21 @@
+{
+	"name": "valid-cargo-manager",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { 
+				"VARIANT": "6.0"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csharp"
+			],
+			"settings": {
+				"editor.formatOnType": true,
+				"editor.formatOnSave": true
+			}
+		}
+	},
+	"remoteUser": "vscode"
+}

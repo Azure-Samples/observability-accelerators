@@ -1,0 +1,6 @@
+azure-servicebus
+azure-cosmos
+asyncio
+opencensus-ext-azure
+jsons
+py-healthcheck

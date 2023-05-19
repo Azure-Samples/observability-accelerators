@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+    operations-api:
+        env_file:
+            - ./operations-api/.env
+        build:
+            context: ./operations-api
+            dockerfile: Dockerfile
+        ports:
+            - "8081:8081"
+    cargo-processing-api:
+        env_file:
+            - ./cargo-processing-api/.env
+        build:
+            context: ./cargo-processing-api
+            dockerfile: Dockerfile
+        ports:
+            - "8080:8080"
+    cargo-processing-validator:
+        env_file:
+            - ./cargo-processing-validator/.env
+        build:
+            context: ./cargo-processing-validator
+            dockerfile: Dockerfile
+    valid-cargo-manager:
+        build:
+            context: ./valid-cargo-manager
+            dockerfile: Dockerfile
+    invalid-cargo-manager:
+        env_file:
+            - ./invalid-cargo-manager/.env
+        build:
+            context: ./invalid-cargo-manager
+            dockerfile: Dockerfile
+

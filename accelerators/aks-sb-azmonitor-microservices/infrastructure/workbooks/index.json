@@ -1,0 +1,218 @@
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 1,
+        "content": {
+          "json": "# Observability and Monitoring Main Dashboard\nThis workbook has been created to provide a consolidated view of microservices observability\n\nIt contains two main sections. The first one displays the Exceptions made from any of the components involved in the whole system.\n\nSecond section can redirect you to two more workbooks that are more focused on Infrastructure or System's behaviour to get a deeper insight of data collected."
+        },
+        "name": "mainTitleText"
+      },
+      {
+        "type": 12,
+        "content": {
+          "version": "NotebookGroup/1.0",
+          "groupType": "editable",
+          "items": [
+            {
+              "type": 1,
+              "content": {
+                "json": "## Exceptions"
+              },
+              "name": "exceptionsText"
+            },
+            {
+              "type": 9,
+              "content": {
+                "version": "KqlParameterItem/1.0",
+                "crossComponentResources": [
+                  "${app_insights_id}"
+                ],
+                "parameters": [
+                  {
+                    "id": "899fa4be-a565-4534-b537-6070e46fd44e",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "Show",
+                    "type": 2,
+                    "isRequired": true,
+                    "query": "datatable(x:string, y:string)[\r\n\"['New Failure Rate (%)'], ['Existing Failure Rate (%)']\", 'New and Existing Failures',\r\n\"['New Failure Rate (%)']\", 'Only New Failures',\r\n\"['Existing Failure Rate (%)']\", 'Only Existing Failures',\r\n]",
+                    "typeSettings": {
+                      "additionalResourceOptions": [],
+                      "showDefault": false
+                    },
+                    "timeContext": {
+                      "durationMs": 86400000
+                    },
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces",
+                    "value": "['New Failure Rate (%)']"
+                  },
+                  {
+                    "id": "38721383-ec13-430d-8229-997332f57352",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "OverTimeRange",
+                    "type": 4,
+                    "isRequired": true,
+                    "typeSettings": {
+                      "selectableValues": [
+                        {
+                          "durationMs": 1800000
+                        },
+                        {
+                          "durationMs": 3600000
+                        },
+                        {
+                          "durationMs": 14400000
+                        },
+                        {
+                          "durationMs": 43200000
+                        },
+                        {
+                          "durationMs": 86400000
+                        },
+                        {
+                          "durationMs": 259200000
+                        },
+                        {
+                          "durationMs": 604800000
+                        }
+                      ]
+                    },
+                    "timeContext": {
+                      "durationMs": 86400000
+                    },
+                    "value": {
+                      "durationMs": 43200000
+                    }
+                  },
+                  {
+                    "id": "8dc31735-b2c2-40a9-94a6-2b73f69a9303",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "UseComparisonTimeRangeOf",
+                    "type": 1,
+                    "isRequired": true,
+                    "query": "let t = {OverTimeRange:seconds};\r\nlet w = case(t <= 86400, '7d', t <= 259200, '14d', t <= 120960, '28d', '60d');\r\nrange i from 1 to 1 step 1\r\n| project x = w",
+                    "timeContext": {
+                      "durationMs": 86400000
+                    },
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
+                  },
+                  {
+                    "id": "3d002cfd-8dca-4015-9f77-26b62fcc2564",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "ProblemFilter",
+                    "type": 2,
+                    "isRequired": true,
+                    "multiSelect": true,
+                    "quote": "'",
+                    "delimiter": ",",
+                    "query": "exceptions\r\n| where timestamp {OverTimeRange}\r\n| summarize Count = count() by problemId\r\n| order by Count desc\r\n| project v = problemId, t = problemId, s=false\r\n| union (datatable(v:string, t:string, s:boolean)[\r\n'*', 'All Exceptions', true\r\n])\r\n",
+                    "crossComponentResources": [
+                      "${app_insights_id}"
+                    ],
+                    "typeSettings": {
+                      "additionalResourceOptions": [],
+                      "showDefault": false
+                    },
+                    "queryType": 0,
+                    "resourceType": "microsoft.insights/components"
+                  },
+                  {
+                    "id": "a4eb0f16-861b-4587-ad9a-774db54a0cc2",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "Source",
+                    "type": 2,
+                    "isRequired": true,
+                    "query": "datatable(x:string, y:string)[\r\n'1 == 1', 'Server and Client Exceptions',\r\n'client_Type <> \"Browser\"', 'Only Server Exceptions',\r\n'client_Type == \"Browser\"', 'Only Client Exceptions',\r\n]",
+                    "crossComponentResources": [
+                      "${app_insights_id}"
+                    ],
+                    "typeSettings": {
+                      "additionalResourceOptions": []
+                    },
+                    "queryType": 0,
+                    "resourceType": "microsoft.insights/components",
+                    "value": "1 == 1"
+                  }
+                ],
+                "style": "pills",
+                "queryType": 0,
+                "resourceType": "microsoft.insights/components"
+              },
+              "name": "displayExceptionsParameters"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let startTime = {OverTimeRange:start};\r\nlet grain = {OverTimeRange:grain};\r\nlet bigWindowTimeRange = {UseComparisonTimeRangeOf};\r\nlet bigWindow = exceptions\r\n| where timestamp >= ago(bigWindowTimeRange) and timestamp < bin(startTime, grain)\r\n| where {Source}\r\n| where problemId in ({ProblemFilter}) or '*' in ({ProblemFilter})\r\n| summarize makeset(problemId, 10000);\r\nexceptions\r\n| where timestamp {OverTimeRange}\r\n| where {Source}\r\n| summarize Count = count(), Users = dcount(user_Id) by problemId\r\n| where problemId in ({ProblemFilter}) or '*' in ({ProblemFilter})\r\n| extend IsNew = iff(problemId !in (bigWindow), true, false)\r\n| where \"{Show}\" == \"['New Failure Rate (%)'], ['Existing Failure Rate (%)']\" or IsNew\r\n| order by Users desc, Count desc, problemId asc\r\n| project Problem = iff(IsNew, strcat('🔸 ', problemId), strcat('🔹 ', problemId)), ['Exception Count'] = Count, ['Users Affected'] = Users",
+                "size": 0,
+                "showAnalytics": true,
+                "queryType": 0,
+                "resourceType": "microsoft.insights/components",
+                "crossComponentResources": [
+                  "${app_insights_id}"
+                ],
+                "gridSettings": {
+                  "formatters": [
+                    {
+                      "columnMatch": "Exception Count",
+                      "formatter": 4,
+                      "formatOptions": {
+                        "min": 0,
+                        "palette": "yellow"
+                      }
+                    },
+                    {
+                      "columnMatch": "Users Affected",
+                      "formatter": 4,
+                      "formatOptions": {
+                        "min": 0,
+                        "palette": "green"
+                      }
+                    }
+                  ]
+                }
+              },
+              "name": "servicesExceptionsQuery"
+            }
+          ]
+        },
+        "name": "exceptionsGroup"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Performance"
+        },
+        "name": "performanceTitleText"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "let cpu = performanceCounters\r\n| where name == \"% Processor Time Normalized\"\r\n| summarize CPU=avg(value) by cloud_RoleName;\r\nlet ioRate = performanceCounters\r\n| where name == \"IO Data Bytes/sec\"\r\n| summarize ioRate=avg(value) by cloud_RoleName;\r\nlet memory = performanceCounters\r\n| where name == \"Available Bytes\"\r\n| summarize Memory=avg(value) by cloud_RoleName;\r\nlet requests = requests\r\n| summarize req_Duration=avg(duration), requestsCount = count() by cloud_RoleName;\r\nlet average = dependencies\r\n| summarize average = avg(duration), dependenciesCount = count() by cloud_RoleName;\r\naverage\r\n| join kind=fullouter requests on cloud_RoleName\r\n| join kind=fullouter memory on cloud_RoleName \r\n| join kind=fullouter ioRate on cloud_RoleName\r\n| join kind=fullouter cpu on cloud_RoleName\r\n| project Service_Name=cloud_RoleName, CPU=iff(isnull(CPU), \"N/A\", strcat(bin(CPU, 0.01), \" %\")), Memory=iff(isnull(Memory), \"N/A\", format_bytes(Memory, 2, \"GB\")), IO_Rate=iff(isnull(ioRate), \"N/A\", strcat(bin(ioRate, 0.01), \" B/s\")), Avg_Dependency=iff(isnull(average), \"N/A\", strcat(bin(average, 0.01), \" ms\")), Dependencies_Count=iff(isnull(dependenciesCount), \"N/A\", tostring(dependenciesCount)), Req_Duration=iff(isnull(req_Duration), \"N/A\", strcat(bin(req_Duration, 0.01), \" ms\")), Requests_Count=iff(isnull(requestsCount), \"N/A\", tostring(requestsCount))",
+          "size": 0,
+          "showAnalytics": true,
+          "timeContext": {
+            "durationMs": 86400000
+          },
+          "queryType": 0,
+          "resourceType": "microsoft.insights/components",
+          "crossComponentResources": [
+            "${app_insights_id}"
+          ]
+        },
+        "name": "servicesMonitoringQuery"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "## Additional workbooks\r\n\r\nThere are two workbooks made to keep track of the entire system's information.\r\n\r\n|Workbooks|Descriiption|Link|\r\n|---------|------------|----|\r\n|Infrastructure|Data related to infrastructure|[Link](https://portal.azure.com/#blade/AppInsightsExtension/UsageNotebookBlade/ComponentId/${logs_workspace_id}/ConfigurationId/${infrastructure_workbook_id}/Type/workbook/WorkbookTemplateName/Infrastructure)|\r\n|System|Data related to system functionality|[Link](https://portal.azure.com/#blade/AppInsightsExtension/UsageNotebookBlade/ComponentId/${logs_workspace_id}/ConfigurationId/${system_workbook_id}/Type/workbook/WorkbookTemplateName/System%20Processing)|"
+        },
+        "name": "workbooksLinksText"
+      }
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }

@@ -1,0 +1,26 @@
+import "@cadl-lang/rest";
+import "./models.cadl";
+
+@serviceTitle("CargoProcessingService")
+namespace CargoProcessingService;
+
+using Cadl.Http;
+using Cadl.Rest;
+using ServiceModels;
+
+@route("/operations")
+interface OperationsService {
+    @put
+    @createsOrUpdatesResource(Operation)
+    putOperation(@path id: string): Operation | Error;
+    @get
+    getOperation(@path id: string): Operation | Error;
+}
+
+@route("/cargo")
+interface CargoService {
+    @put
+    updateCargo(@path id: string, @header("operation-id") operationId?: string, @body body: Cargo): CargoHydrated | Error;
+    @post
+    createCargo(@body body: Cargo): CargoHydrated | Error;
+}

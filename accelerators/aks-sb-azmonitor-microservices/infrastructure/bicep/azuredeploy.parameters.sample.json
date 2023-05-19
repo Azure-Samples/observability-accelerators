@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "uniqueUserName": {
+      "value": "myusername"
+    },
+    "cosmosDatabaseName": {
+      "value": "cargo"
+    },
+    "cosmosContainer1Name": {
+      "value": "valid-cargo"
+    },
+    "cosmosContainer2Name": {
+      "value": "invalid-cargo"
+    },
+    "cosmosContainer3Name": {
+      "value": "operations"
+    },
+    "serviceBusQueue1Name": {
+      "value": "ingest-cargo"
+    },
+    "serviceBusQueue2Name": {
+      "value": "operation-state"
+    },
+    "serviceBusTopicName": {
+      "value": "validated-cargo"
+    },
+    "serviceBusSubscription1Name": {
+      "value": "valid-cargo"
+    },
+    "serviceBusSubscription2Name": {
+      "value": "invalid-cargo"
+    },
+    "serviceBusTopicRule1Name": {
+      "value": "valid"
+    },
+    "serviceBusTopicRule2Name": {
+      "value": "invalid"
+    },
+    "notificationEmailAddress": {
+      "value": "alias@microsoft.com"
+    }
+  }
+}

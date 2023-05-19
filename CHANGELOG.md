@@ -1,13 +1,15 @@
-## [project-title] Changelog
+# Observability Accelerators Changelog
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+## 1.0 (2023-05-19)
 
-*Features*
-* ...
+### Features
 
-*Bug Fixes*
-* ...
+- Initial public release
 
-*Breaking Changes*
-* ...
+### Bug Fixes
+
+- Not applicable
+
+### Breaking Changes
+
+- Not applicable

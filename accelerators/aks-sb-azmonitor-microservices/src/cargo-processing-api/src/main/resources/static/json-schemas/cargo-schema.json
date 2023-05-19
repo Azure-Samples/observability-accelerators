@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "default": {},
+  "title": "Cargo Schema",
+  "required": [
+      "product",
+      "port",
+      "demandDates"
+  ],
+  "properties": {
+      "product": {
+          "type": "object",
+          "default": {},
+          "title": "The product in the cargo",
+          "required": [
+              "name",
+              "quantity"
+          ],
+          "properties": {
+              "name": {
+                  "type": "string",
+                  "default": "",
+                  "title": "The name of the product",
+                  "examples": [
+                      "Toys"
+                  ]
+              },
+              "quantity": {
+                  "type": "integer",
+                  "default": 0,
+                  "title": "The quantity of the product to be shipped",
+                  "examples": [
+                      100
+                  ]
+              }
+          },
+          "examples": [{
+              "name": "Toys",
+              "quantity": 100
+          }]
+      },
+      "port": {
+          "type": "object",
+          "default": {},
+          "title": "The ports the cargo will use",
+          "required": [
+              "source",
+              "destination"
+          ],
+          "properties": {
+              "source": {
+                  "type": "string",
+                  "default": "",
+                  "title": "The source port for the cargo",
+                  "examples": [
+                      "New York City"
+                  ]
+              },
+              "destination": {
+                  "type": "string",
+                  "default": "",
+                  "title": "The destination port for the cargo",
+                  "examples": [
+                      "Tacoma"
+                  ]
+              }
+          },
+          "examples": [{
+              "source": "New York City",
+              "destination": "Tacoma"
+          }]
+      },
+      "demandDates": {
+          "type": "object",
+          "default": {},
+          "title": "The the dates the cargo is expected to be transported",
+          "required": [
+              "start",
+              "end"
+          ],
+          "properties": {
+              "start": {
+                  "type": "string",
+                  "default": "",
+                  "format": "date-time",
+                  "title": "The start date",
+                  "examples": [
+                      "2022-06-24T00:00:00.000Z"
+                  ]
+              },
+              "end": {
+                  "type": "string",
+                  "default": "",
+                  "format": "date-time",
+                  "title": "The end date",
+                  "examples": [
+                      "2022-06-30T00:00:00.000Z"
+                  ]
+              }
+          },
+          "examples": [{
+              "start": "2022-06-24T00:00:00.000Z",
+              "end": "2022-06-30T00:00:00.000Z"
+          }]
+      }
+  },
+  "examples": [{
+      "product": {
+          "name": "Toys",
+          "quantity": 100
+      },
+      "port": {
+          "source": "New York City",
+          "destination": "Tacoma"
+      },
+      "demandDates": {
+          "start": "2022-06-24T00:00:00.000Z",
+          "end": "2022-06-30T00:00:00.000Z"
+      }
+  }]
+}

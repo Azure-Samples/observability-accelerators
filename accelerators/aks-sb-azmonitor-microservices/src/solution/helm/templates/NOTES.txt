@@ -1,0 +1,5 @@
+1. Get the application URL by running these commands:
+  
+  export INGRESS_IP=$(kubectl get ingress --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "aks-sb-azmonitor-microservices.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+  
+  curl http://$INGRESS_IP/

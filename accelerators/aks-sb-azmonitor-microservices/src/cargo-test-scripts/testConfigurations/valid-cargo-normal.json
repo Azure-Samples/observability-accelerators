@@ -1,0 +1,15 @@
+{
+    "tests": [
+        {
+            "name": "End to End Validation of valid cargo with normal ports",
+            "target": "cargo-processing-api",
+            "volume": 50,
+            "validateResults": false,
+            "delayBetweenCargoInMilliseconds": 1000,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 0
+            }
+        }
+    ]
+}

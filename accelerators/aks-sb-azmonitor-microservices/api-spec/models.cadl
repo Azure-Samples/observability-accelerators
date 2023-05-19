@@ -1,0 +1,65 @@
+import "@cadl-lang/rest";
+
+namespace ServiceModels;
+using Cadl.Http;
+using Cadl.Rest;
+
+@error
+model Error {
+  code: int32;
+  message: string;
+  target: string;
+}
+
+model Product {
+  name: string;
+  quantity: int32;
+}
+
+model Port {
+  source: string;
+  destination: string;
+}
+
+model DemandDates {
+  start: plainDate;
+  end: plainDate;
+}
+
+model Cargo {
+  product: Product;
+  port: Port;
+  demandDates: DemandDates;
+  @header
+  operationId: string;
+}
+
+model CargoHydrated {
+  ...Cargo;
+  @visibility("read")
+  @key
+  id: string;
+  @visibility("read")
+  timestamp: zonedDateTime;
+  @header
+  waitTime: int32
+}
+
+model CargoValidated {
+  ...Cargo;
+  @visibility("read")
+  @key
+  id: string;
+  @visibility("read")
+  timestamp: zonedDateTime;
+  valid: boolean;
+  error: string;
+}
+
+model Operation {
+  id: string;
+  state: string;
+  result?: CargoValidated;
+  error?: string;
+  updatedAt: zonedDateTime;
+}

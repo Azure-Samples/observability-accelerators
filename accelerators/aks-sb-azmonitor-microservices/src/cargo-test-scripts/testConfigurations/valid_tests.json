@@ -1,0 +1,28 @@
+{
+    "tests": [
+        {
+            "name": "End to End Validation of valid cargo",
+            "target": "cargo-processing-api",
+            "volume": 5,
+            "validateResults": true,
+            "validationDelayInMilliseconds": 10000,
+            "maxRetries": 5,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 0
+            }
+        },
+        {
+            "name": "End to End Validation of invalid cargo",
+            "target": "cargo-processing-api",
+            "volume": 5,
+            "validateResults": true,
+            "validationDelayInMilliseconds": 10000,
+            "maxRetries": 5,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 1
+            }
+        }
+    ]
+}

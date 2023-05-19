@@ -1,0 +1,35 @@
+{{- $fullName := include "aks-sb-azmonitor-microservices.fullname" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    {{- include "aks-sb-azmonitor-microservices.labels" . | nindent 4 }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /cargo
+        pathType: Prefix
+        backend:
+          service:
+            name: cargo-processing-api
+            port:
+              number: 80
+      - path: /actuator/health
+        pathType: Prefix
+        backend:
+          service:
+            name: cargo-processing-api
+            port:
+              number: 80
+      - path: /operations
+        pathType: Prefix
+        backend:
+          service:
+            name: operations-api
+            port:
+              number: 80

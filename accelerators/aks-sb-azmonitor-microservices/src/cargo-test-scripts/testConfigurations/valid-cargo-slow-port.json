@@ -1,0 +1,23 @@
+{
+    "tests": [
+        {
+            "name": "End to End Validation of valid cargo with 50% chance of slow port",
+            "target": "cargo-processing-api",
+            "volume": 50,
+            "validateResults": false,
+            "delayBetweenCargoInMilliseconds": 1000,
+            "startingRetryBufferInMilliseconds": 300,
+            "properties": {
+                "chanceToInvalidate": 0,
+                "chaosSettings": [
+                    {
+                        "target": "cargo-processing-api",
+                        "type": "slow-port",
+                        "chanceToCauseChaos": 2,
+                        "isEnabled": true
+                    }
+                ]
+            }
+        }
+    ]
+}

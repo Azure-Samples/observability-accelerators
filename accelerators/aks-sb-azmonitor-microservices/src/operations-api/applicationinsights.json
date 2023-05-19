@@ -1,0 +1,17 @@
+{
+  "role": {
+    "name": "operations-api"
+  },
+  "instrumentation": {
+    "logging": {
+      "level": "INFO"
+    }
+  },
+  "preview": {
+    "instrumentation": {
+      "springIntegration": {
+        "enabled": true
+      }
+    }
+  }
+}
