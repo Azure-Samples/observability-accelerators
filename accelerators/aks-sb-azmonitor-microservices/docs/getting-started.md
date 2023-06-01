@@ -24,7 +24,9 @@ Copy the `.env.sample` file to `.env` and fill in the required values.
 
 The sample uses either Bicep or Terraform to provision the required infrastructure. Run `./deploy-bicep.sh` to deploy the application to Azure using Bicep, or `./deploy-terraform.sh` to do so using Terraform. The scripts will create the required resources in Azure, build the docker images, push them to Azure Container Registry and deploy the containers to Azure Kubernetes Service (AKS).
 
-> **_NOTE:_** By default, the AKS cluster is deployed without AAD integration. To enable AAD integration, pass the `--aks-aad-auth` switch to the deployment script. This will configure authentication for the current `az` user. To configure for a service principal, set the `ARM_CLIENT_ID` value to the client ID for the service principal.
+By default, the AKS cluster is deployed without AAD integration. To enable AAD integration, pass the `--aks-aad-auth` switch to the deployment script. This will configure authentication for the current `az` user. To configure for a service principal, set the `ARM_CLIENT_ID` value to the client ID for the service principal.
+
+> **_NOTE:_** If you are running ARM architecture (Mac M1 or M2) to ensure images are built using the correct platform set `DOCKER_DEFAULT_PLATFORM=linux/amd64`.
 
 ## Sending Requests
 
