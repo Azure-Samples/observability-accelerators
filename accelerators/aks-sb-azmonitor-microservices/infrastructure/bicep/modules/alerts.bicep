@@ -315,50 +315,50 @@ resource keyVaultSaturationAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = 
 
 // Tenant specific issues prevent deployment of custom metric alert
 // 
-resource productQtyScheduledForDestinationPortAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
-  name: 'productQtyScheduledForDestinationPort'
-  location: 'global'
-  properties: {
-    description: 'Alert when a single port/destination receives more than quantity 1000 of a given product.'
-    criteria: {
-      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
-      allOf: [
-        {
-          metricName: 'port_product_qty'
-          metricNamespace: 'azure.applicationinsights'
-          name: 'Metric1'
-          skipMetricValidation: true
-          timeAggregation: 'Total'
-          criterionType: 'StaticThresholdCriterion'
-          operator: 'GreaterThan'
-          threshold: 1000
-          dimensions: [
-            {
-              name: 'destination'
-              operator: 'Include'
-              values: [
-                '*'
-              ]
-            }
-            {
-              name: 'product'
-              operator: 'Include'
-              values: [
-                '*'
-              ]
-            }
-          ]
-        }
-      ]
-    }
-    scopes: [ appInsightsId ]
-    actions: defaultMetricAlertActions
-    evaluationFrequency: 'PT1M'
-    windowSize: 'PT1M'
-    severity: 3
-    enabled: false
-  }
-}
+// resource productQtyScheduledForDestinationPortAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+//   name: 'productQtyScheduledForDestinationPort'
+//   location: 'global'
+//   properties: {
+//     description: 'Alert when a single port/destination receives more than quantity 1000 of a given product.'
+//     criteria: {
+//       'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+//       allOf: [
+//         {
+//           metricName: 'port_product_qty'
+//           metricNamespace: 'azure.applicationinsights'
+//           name: 'Metric1'
+//           skipMetricValidation: true
+//           timeAggregation: 'Total'
+//           criterionType: 'StaticThresholdCriterion'
+//           operator: 'GreaterThan'
+//           threshold: 1000
+//           dimensions: [
+//             {
+//               name: 'destination'
+//               operator: 'Include'
+//               values: [
+//                 '*'
+//               ]
+//             }
+//             {
+//               name: 'product'
+//               operator: 'Include'
+//               values: [
+//                 '*'
+//               ]
+//             }
+//           ]
+//         }
+//       ]
+//     }
+//     scopes: [ appInsightsId ]
+//     actions: defaultMetricAlertActions
+//     evaluationFrequency: 'PT1M'
+//     windowSize: 'PT1M'
+//     severity: 3
+//     enabled: false
+//   }
+// }
 
 resource microserviceExceptionsAlert 'Microsoft.Insights/scheduledQueryRules@2022-06-15' = {
   name: 'microserviceExceptions'
