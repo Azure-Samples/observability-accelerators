@@ -59,7 +59,9 @@ param kvTenantId string = tenant().tenantId
 
 @description('Definition Id for AcrPull role')
 @minLength(1)
-param roleAcrPull string = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+// 7f951dda-4ed3-4680-a7ca-43fe172d538d is the ID for AcrPull
+// see https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#acrpull
+param roleAcrPull string = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
 
 @description('Configure Azure Active Directory authentication for Kubernetes cluster')
 param aksAadAuth bool = false
@@ -91,7 +93,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+resource acrPullRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope: subscription()
   name: roleAcrPull
 }
@@ -104,7 +106,7 @@ module acr 'modules/acr.bicep' = {
     location: resourceGroup.location
     acrName: acrName
     aksPrincipalId: aks.outputs.clusterPrincipalID
-    roleDefinitionId: contributorRoleDefinition.id
+    roleDefinitionId: acrPullRoleDefinition.id
   }
 }
 
