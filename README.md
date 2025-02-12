@@ -1,3 +1,5 @@
+> **⚠️ This repository has been retired as of February 2025.**
+
 # Observability Accelerators
 
 This repository contains multiple samples that are meant to accelerate development in the Observability and Monitoring space on Azure.
